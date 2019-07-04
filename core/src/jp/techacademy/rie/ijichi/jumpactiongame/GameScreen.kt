@@ -14,6 +14,9 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.viewport.FitViewport
 import java.util.*
 import kotlin.collections.ArrayList
+import com.badlogic.gdx.audio.Sound
+
+
 
 class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
     companion object {
@@ -41,6 +44,7 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
     private var mRandom: Random
     private var mSteps: ArrayList<Step>
     private var mStars: ArrayList<Star>
+    private var mEnemy: ArrayList<Enemy>
     private lateinit var mUfo: Ufo
     private lateinit var mPlayer: Player
 
@@ -74,6 +78,7 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
         mRandom = Random()
         mSteps = ArrayList<Step>()
         mStars = ArrayList<Star>()
+        mEnemy = ArrayList<Enemy>()
         mGameState = GAME_STATE_READY
         mTouchPoint = Vector3()
 
@@ -123,6 +128,11 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
             mStars[i].draw(mGame.batch)
         }
 
+        //Enemy
+        for (i in 0 until mEnemy.size) {
+            mEnemy[i].draw(mGame.batch)
+        }
+
         // UFO
         mUfo.draw(mGame.batch)
 
@@ -150,11 +160,13 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
 
         // テクスチャの準備
         val stepTexture = Texture("step.png")
-        val staeTexture = Texture("star.png")
+        val starTexture = Texture("star.png")
         val playerTexture = Texture("uma.png")
         val ufoTexture = Texture("ufo.png")
+        val enemyTexture = Texture("enemy.png")
 
-        // StepとStarをゴールの高さまで配置していく
+        // StepとStarをゴール
+        // の高さまで配置していく
         var y = 0f
 
         val maxJumpHeight = Player.PLAYER_JUMP_VELOCITY * Player.PLAYER_JUMP_VELOCITY / (2 * -GRAVITY)
@@ -167,9 +179,15 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
             mSteps.add(step)
 
             if (mRandom.nextFloat() > 0.6f) {
-                val star = Star(staeTexture, 0, 0, 72, 72)
+                val star = Star(starTexture, 0, 0, 72, 72)
                 star.setPosition(step.getX() + mRandom.nextFloat(), step.getY() + Star.STAR_HEIGHT + mRandom.nextFloat() * 3)
                 mStars.add(star)
+            }
+
+            if (mRandom.nextFloat() > 0.7f) {
+                val enemy = Enemy(enemyTexture, 0, 0, 72, 72)
+                enemy.setPosition(step.getX() + mRandom.nextFloat(), step.getY() + Enemy.ENEMY_HEIGHT + mRandom.nextFloat() * 3)
+                mEnemy.add(enemy)
             }
 
             y += (maxJumpHeight - 0.5f)
@@ -241,8 +259,8 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
 
     //ゲーム終了後にタッチしたらResultScreenに遷移する
     private fun updateGameOver() {
-        if (Gdx.input.justTouched()){
-            mGame.screen = ResultScreen(mGame,mScore)
+        if (Gdx.input.justTouched()) {
+            mGame.screen = ResultScreen(mGame, mScore)
         }
 
     }
@@ -298,6 +316,21 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
                 }
             }
         }
+
+        //enemyとの当たり判定
+        for (i in 0 until mEnemy.size) {
+            val enemy = mEnemy[i]
+
+            if (mPlayer.boundingRectangle.overlaps(enemy.boundingRectangle)) {
+                mPlayer.hitEnemy()
+                mGameState = GAME_STATE_GAMEOVER
+//                val sound = Gdx.audio.newSound(Gdx.files.internal("data/bomb2.mp3"))
+//                sound.play()
+//                sound.dispose()
+                return
+            }
+        }
+
     }
 
     private fun checkGameOver() {

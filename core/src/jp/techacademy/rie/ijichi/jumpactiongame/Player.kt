@@ -1,5 +1,6 @@
 package jp.techacademy.rie.ijichi.jumpactiongame
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 
 class Player(texture: Texture, srcX: Int, srcY: Int, srcWidth: Int, srcHeight: Int) : GameObject(texture, srcX, srcY, srcWidth, srcHeight) {
@@ -56,5 +57,12 @@ class Player(texture: Texture, srcX: Int, srcY: Int, srcWidth: Int, srcHeight: I
     fun hitStep(){
         velocity.y = PLAYER_JUMP_VELOCITY
         mState = PLAYER_STATE_JUMP
+    }
+
+    fun hitEnemy(){
+        val sound = Gdx.audio.newSound(Gdx.files.internal("data/bomb2.mp3"))
+        sound.play()
+        sound.dispose()
+
     }
 }
