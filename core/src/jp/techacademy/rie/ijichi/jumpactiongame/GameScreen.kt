@@ -55,6 +55,7 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
     private var mScore: Int
     private var mHightScore: Int
     private var mPrefs: Preferences
+    private var sound: Sound
 
     init {
         // 背景の準備
@@ -90,6 +91,8 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
         // ハイスコアをPreferencesから取得する
         mPrefs = Gdx.app.getPreferences("jp.techacademy.rie.ijichi.jumpactiongame")
         mHightScore = mPrefs.getInteger("HIGHSCORE", 0)
+
+        sound = Gdx.audio.newSound(Gdx.files.internal("data/bomb2.mp3"))
 
 
         createStage()
@@ -322,15 +325,12 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
             val enemy = mEnemy[i]
 
             if (mPlayer.boundingRectangle.overlaps(enemy.boundingRectangle)) {
-                mPlayer.hitEnemy()
                 mGameState = GAME_STATE_GAMEOVER
-//                val sound = Gdx.audio.newSound(Gdx.files.internal("data/bomb2.mp3"))
-//                sound.play()
-//                sound.dispose()
+                sound.play(1.0f)
+                sound.dispose()
                 return
             }
         }
-
     }
 
     private fun checkGameOver() {

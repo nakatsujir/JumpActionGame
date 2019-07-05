@@ -58,11 +58,4 @@ class Player(texture: Texture, srcX: Int, srcY: Int, srcWidth: Int, srcHeight: I
         velocity.y = PLAYER_JUMP_VELOCITY
         mState = PLAYER_STATE_JUMP
     }
-
-    fun hitEnemy(){
-        val sound = Gdx.audio.newSound(Gdx.files.internal("data/bomb2.mp3"))
-        sound.play()
-        sound.dispose()
-
-    }
 }
